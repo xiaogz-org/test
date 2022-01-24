@@ -1,15 +1,13 @@
 <template>
   <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div class="container">
-      <div class="grid-item">{{msg}}</div>
-      <div class="grid-item">{{nameCount}}<button @click="addCount">+1</button></div>
-      <div class="grid-item">
-        {{switchBtn}} <button @click="switchBtn = !switchBtn">切换</button>
-      </div>
       <div class="grid-item"></div>
-      <div class="grid-item"><baseMap></baseMap></div>
+      <div class="grid-item"></div>
+      <div class="grid-item"></div>
+      <div class="grid-item"></div>
+      <div class="grid-item">
+        <baseMap></baseMap>
+      </div>
       <div class="grid-item"></div>
       <div class="grid-item"></div>
       <div class="grid-item"></div>
@@ -24,10 +22,8 @@ import { state, methods } from './home.js'
 import { defineComponent, onMounted, toRefs} from 'vue';
 
 export default defineComponent({
-  name: 'Home',
   data() {
     return {
-      msg: "123"
     }
   },
   components: {
