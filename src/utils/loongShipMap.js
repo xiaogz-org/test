@@ -15,8 +15,8 @@ class MapInstance {
     const icon = L.icon({
       iconUrl: "./favicon.ico"
     });
-
-    console.log(icon);
+    
+    console.log(this.$map);
     L.marker([24.494646955731685, 118.23211669921875], {
       icon: icon
     }).addTo(this.$map);
