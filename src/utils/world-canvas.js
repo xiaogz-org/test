@@ -1,11 +1,14 @@
 import * as canvasUtils from './canvas-utils'
 class WorldCanvas {
   constructor() {
+    this._map = null
     this.ctx = null;
     this.canvas = null
+    this.shipList = {}
   }
   init(map) {
-    let {x: width, y: height} = map.getSize();
+    this._map = map
+    let { x: width, y: height } = map.getSize();
     this.canvas = document.createElement('canvas')
     this.canvas.className = "world-canvas"
     this.canvas.width = width
@@ -15,55 +18,70 @@ class WorldCanvas {
   }
   //绘制船舶
   drawShip() {
+    /* const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.moveTo(75, 50);
+    ctx.lineTo(100, 75);
+    ctx.lineTo(100, 25);
+    ctx.fill(); */
     let fillStyle = '#faf763'
     let ship = {
-      "mmsi": 561035,
-      "lat": 24.317671666666666,
-      "lon": 70901484,
-      "name": "800333 80",
+      "mmsi": 22436359,
+      "lat": 24.448611666666668,
+      "lon": 70984469,
+      "name": "AIP I",
       "customName": null,
       "heading": -1,
-      "course": 156.3,
-      "speed": 1.5,
-      "posTime": 1642534927,
+      "course": 0,
+      "speed": 0,
+      "posTime": 1643164736,
       "status": 0,
       "customStatus": null,
       "shipType": 5,
       "shipTypeSpec": null,
       "customShipType": null,
-      "breadth": 0,
-      "length": 0,
-      "sourceId": "86",
+      "breadth": 16,
+      "length": 105,
+      "sourceId": "28",
       "safeRadius": null,
-      "lng": 118.16914,
-      "rotate": 156.3,
-      "shipX": 1210,
-      "shipY": 1003,
-      "areaPos": [
-          {
-              "x": 1214.4214255432155,
-              "y": 1013.0722885267352
-          },
-          {
-              "x": 1199.1689363034075,
-              "y": 995.7413459098566
-          },
-          {
-              "x": 1211.9882126101613,
-              "y": 990.114077036673
-          }
-      ],
-      "searchFlag": false
+      "lng": 118.30744833333334,
+      "rotate": -1,
+      /* "shipX": 1374,
+      "shipY": 557,
+      "areaPos": [{
+          "x": 1373.8080235291898,
+          "y": 546.0016753532797
+        },
+        {
+          "x": 1381.1909103369048,
+          "y": 567.8761578016594
+        },
+        {
+          "x": 1367.1930426047154,
+          "y": 568.1204914917813
+        }
+      ] */
     }
+    
+    const { lat, lng } = ship
+    const { shipX, shipY } = canvasUtils.getShipXY(lat, lng, this._map)
+    
+    const areaPos = canvasUtils.getAreaPos(shipX, shipY, ship.rotate)
+
+    ship = {
+      ...ship,
+      shipX,
+      shipY,
+      areaPos
+    }
+    console.log(ship);
     const ctx = this.ctx
     if (!ctx) return
 
-    const { shipX, shipY, rotate, areaPos } = ship
-    ctx.fillStyle =
-      this.isDarkTheme && fillStyle == '#faf763' ? '#202200' : fillStyle
+    //const { areaPos } = ship
+    ctx.fillStyle = this.isDarkTheme && fillStyle == '#faf763' ? '#202200' : fillStyle
     ctx.strokeStyle = this.isDarkTheme ? '#FAF763' : '#000'
     ctx.lineWidth = ship.sourceId == '28' ? 2 : 1
-
     ctx.beginPath()
     ctx.moveTo(areaPos[0].x, areaPos[0].y)
     ctx.lineTo(areaPos[1].x, areaPos[1].y)
@@ -73,38 +91,22 @@ class WorldCanvas {
     ctx.fill()
     ctx.stroke()
     ctx.closePath()
+  }
+  //重置canvas
+  resetCanvas() {
+    const parentDom = document.querySelector('.leaflet-map-pane')
+    const offsetList = []
+    console.log(parentDom.style.transform);
+    parentDom.style.transform.replace(/[-.\d]+(?=px)/g, searchVal => {
+      offsetList.push(+searchVal)
+    })
+    console.log(offsetList);
+    const [x, y, z] = offsetList
+    this.canvas.style.transform = `translate3d(${-x}px, ${-y}px, ${-z}px)`
+  }
+  //
+  resetShip() {
 
-    ctx.save()
-    ctx.translate(shipX, shipY)
-    ctx.rotate((rotate * Math.PI) / 180)
-
-    if (ship.speed > 0.1) {
-      ctx.beginPath()
-      ctx.moveTo(0, -canvasUtils.SHIP_HEIGHT_SIZE / 2 + 4)
-      ctx.lineTo(0, -canvasUtils.SHIP_HEIGHT_SIZE - 4)
-      ctx.lineWidth = 2
-      ctx.stroke()
-      ctx.closePath()
-    }
-
-    ctx.restore()
-    ctx.lineWidth = 1
-
-    if (fillStyle != '#f00') {
-      this.shipBoundceList.push({
-        minX: shipX - 11,
-        maxX: shipX + 11,
-        minY: shipY - 8,
-        maxY: shipY + 8
-      })
-    } else {
-      this.systemShipBoundceList.push({
-        minX: shipX - 11,
-        maxX: shipX + 11,
-        minY: shipY - 8,
-        maxY: shipY + 8
-      })
-    }
   }
 }
 

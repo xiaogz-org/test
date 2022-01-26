@@ -16,12 +16,19 @@ export default defineComponent({
         
       let map = MapCore.$map;
       console.log(map.getSize());
-      // map.on("zoom", () => {
-      // 	console.log("zoom");
-      // })
-      // map.on("move", () => {
-      // 	console.log("move");
-      // })
+      map.on("zoom", (e) => {
+        console.log(e);
+      })
+      map.on("move", (e) => {
+        console.log(e);
+        /**
+         * 1、重置canvas
+         * 2、重新请求新区域船舶信息
+         * 3、重新将canvas上的船舶定位（随着地图移动）
+         */
+        worldCanvas.resetCanvas()
+        
+      })
       map.on('click', e => {
         console.log(e);
       });
