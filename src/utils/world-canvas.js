@@ -1,4 +1,5 @@
 import * as canvasUtils from './canvas-utils'
+import { shipList } from '../mock/shipList.js'
 class WorldCanvas {
   constructor() {
     this.ctx = null;
@@ -7,6 +8,7 @@ class WorldCanvas {
     this.shipMaps = null
     this.CW = 0
     this.CH = 0
+    this.shipList = shipList
   }
   init(map) {
     this._map = map
@@ -21,46 +23,41 @@ class WorldCanvas {
     this.canvas.addEventListener('mousemove', (e) => {
       let x = e.pageX, y = e.pageY
       //重新绘制canvas上的路径
-      // this.clear()
-      // this.drawShip()
-      console.log(this.ctx.isPointInPath(x,y));
-      if(this.ctx.isPointInPath(x,y)) {
-        console.log("true");
+      this.clear()
+      let pointer = false
+      for(let val of this.shipList) {
+        this.drawShip(val)
+        if(this.ctx.isPointInPath(x, y) === true) {
+          pointer = true
+          this.canvas.style.cursor = 'pointer'
+        }
+      }
+      //因为是给整个canvas设置cursor, 所以放循环外面，否则就会被元素重置
+      if(!pointer) {
+        this.canvas.style.cursor = ''
+      }
+    })
+    this.canvas.addEventListener('click', (e) => {
+      let x = e.pageX, y = e.pageY
+      //重新绘制canvas上的路径
+      this.clear()
+      for(let val of this.shipList) {
+        this.drawShip(val)
+        if(this.ctx.isPointInPath(x, y)) {
+          alert(val.mmsi)
+        }
       }
     })
   }
   //绘制船舶
-  drawShip() {
+  drawShip(ship) {
     let fillStyle = '#faf763'
-    let ship = {
-      "mmsi": 22436359,
-      "lat": 24.448611666666668,
-      "lon": 70984469,
-      "name": "AIP I",
-      "customName": null,
-      "heading": -1,
-      "course": 0,
-      "speed": 0,
-      "posTime": 1643164736,
-      "status": 0,
-      "customStatus": null,
-      "shipType": 5,
-      "shipTypeSpec": null,
-      "customShipType": null,
-      "breadth": 16,
-      "length": 105,
-      "sourceId": "28",
-      "safeRadius": null,
-      "lng": 118.30744833333334,
-      "rotate": 10,
-      "searchFlag": false
-    }
+    
     const ctx = this.ctx
     if (!ctx) return
-    const { lat, lng } = ship
+    const { lat, lng, breadth, length, rotate } = ship
     const { shipX, shipY } = canvasUtils.getShipXY(lat, lng, this._map)
-    const areaPos1 = canvasUtils.getAreaPos(shipX, shipY, ship.rotate)
-    const areaPos = canvasUtils.getBigShipAreaPos(shipX, shipY, ship.rotate)
+    const areaPos = canvasUtils.getBigShipAreaPos({shipX, shipY, breadth, length, rotate}, this._map.getZoom())
 
     ctx.fillStyle = this.isDarkTheme && fillStyle == '#faf763' ? '#202200' : fillStyle
     ctx.strokeStyle = this.isDarkTheme ? '#FAF763' : '#000'
@@ -71,7 +68,6 @@ class WorldCanvas {
     ctx.stroke()
     ctx.fill()
     ctx.closePath()
-
     function drawPath(areaPos) {
       areaPos.forEach((val, i) => {
         if(i === 0) {
@@ -81,6 +77,11 @@ class WorldCanvas {
         }
       });
       ctx.lineTo(areaPos[0].x, areaPos[0].y)
+    }
+  }
+  drawAllShip() {
+    for(let val of this.shipList) {
+      this.drawShip(val)
     }
   }
   resetCanvas() {
@@ -96,6 +97,7 @@ class WorldCanvas {
   }
   //重置画布
   clear() {
+    console.log('clear');
     this.ctx.clearRect(0, 0, this.CW, this.CH)
   }
 }

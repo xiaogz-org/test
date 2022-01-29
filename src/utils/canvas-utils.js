@@ -24,13 +24,10 @@ export const getShipXY = (lat, lng, map) => {
 export const getAreaPos = (shipX, shipY, rotate) => {
   // 由于 Y 轴是相反的，所以需要...
   const rad = -(Math.PI / 180) * rotate //角度换弧度
-  console.log(rad);
   const startX1 = 0
   const startY1 = 0 - SHIP_HEIGHT_SIZE / 2
 
   // startX1 * Math.cos(rad) - startY1 * Math.sin(rad) 是根据圆点， + shipX是 坐标偏移
-  console.log('A :>> ', startX1 * Math.cos(rad));
-  console.log('B :>> ', startY1 * Math.sin(rad));
   const topPosX = startX1 * Math.cos(rad) + startY1 * Math.sin(rad) + shipX
   const topPosY = -startX1 * Math.sin(rad) + startY1 * Math.cos(rad) + shipY
 
@@ -61,29 +58,46 @@ export const getAreaPos = (shipX, shipY, rotate) => {
     }
   ]
 }
-//获取大型船舶区域定位
-export const getBigShipAreaPos = (shipX, shipY, rotate) => {
+//获取大型船舶区域定位, 船长、船宽根据船舶实际决定，并设定最大和最小范围，可根据地图比例缩放
+export const getBigShipAreaPos = (ship, zoom) => {
   // 由于 Y 轴是相反的，所以需要...
+  const {shipX, shipY, rotate, breadth, length} = ship
+  const ratio = zoom - 14 //大船随缩放等级从14开始逐级加1
+  const BREADTH_RATIO = 1 / 3, LENGTH_RATIO = 1 / 5 //目前宽度缩放比例为1/3， 长度为1/5
   const rad = -(Math.PI / 180) * rotate //角度换弧度
-  const SHIP_WIDE = 16, SHIP_HIGH = 50
-  const shipPoint = []
+  const BIG_SHIP_HALF_BREADTH = (breadth / 2) * ratio * BREADTH_RATIO, BIG_SHIP_HALF_LENGTH = (length / 2) * ratio *  LENGTH_RATIO
+  const resultPoints = []
+  const ordinaryShip = [
+    {x: 0, y: 0 - SHIP_HEIGHT_SIZE / 2},
+    {x: 0 + SHIP_BOTTOM_SIZE / 2,y: 0 + SHIP_HEIGHT_SIZE / 2},
+    {x: 0 - SHIP_BOTTOM_SIZE / 2, y: 0 + SHIP_HEIGHT_SIZE / 2},
+  ]
+  const specialShip = [
+    {x: -BIG_SHIP_HALF_BREADTH, y: -BIG_SHIP_HALF_LENGTH},
+    {x: (- 2 / 3) * BIG_SHIP_HALF_BREADTH, y: - (BIG_SHIP_HALF_LENGTH / 2 + BIG_SHIP_HALF_LENGTH)},
+    {x: 0, y:  - (BIG_SHIP_HALF_LENGTH * 5/6 + BIG_SHIP_HALF_LENGTH)},
+    {x: 2 / 3 * BIG_SHIP_HALF_BREADTH, y: - (BIG_SHIP_HALF_LENGTH / 2 + BIG_SHIP_HALF_LENGTH)},
+    {x: BIG_SHIP_HALF_BREADTH, y: -BIG_SHIP_HALF_LENGTH},
+    {x: BIG_SHIP_HALF_BREADTH, y: BIG_SHIP_HALF_LENGTH},
+    {x: BIG_SHIP_HALF_BREADTH / 2, y: BIG_SHIP_HALF_LENGTH / 3 + BIG_SHIP_HALF_LENGTH},
+    {x: -BIG_SHIP_HALF_BREADTH / 2, y: BIG_SHIP_HALF_LENGTH / 3 + BIG_SHIP_HALF_LENGTH},
+    {x: -BIG_SHIP_HALF_BREADTH, y: BIG_SHIP_HALF_LENGTH},
+  ]
 
-  let x1 = -(SHIP_WIDE / 2), y1 = -(SHIP_HIGH / 2)
-  
-  let x2 = (SHIP_WIDE / 2), y2 = -(SHIP_HIGH / 2)
-  let x3 = (SHIP_WIDE / 2), y3 = (SHIP_HIGH / 2)
-  let x4 = -(SHIP_WIDE / 2), y4 = (SHIP_HIGH / 2)
-
-  shipPoint.push(pointOffset(x1,y1))
-  shipPoint.push(pointOffset(x2,y2))
-  shipPoint.push(pointOffset(x3,y3))
-  shipPoint.push(pointOffset(x4,y4))
-
+  if(zoom <= 14) {
+    ordinaryShip.forEach(v => {
+      resultPoints.push(pointOffset(v.x, v.y))
+    })
+  }else {
+    specialShip.forEach(v => {
+      resultPoints.push(pointOffset(v.x, v.y))
+    })
+  }
   function pointOffset(x1,y1) {
     let x = x1 * Math.cos(rad) + y1 * Math.sin(rad) + shipX
     let y = -x1 * Math.sin(rad) + y1 * Math.cos(rad) + shipY
     return {x, y}
   }
-  console.log(shipPoint);
-  return shipPoint;
+  //console.log(shipPoint);
+  return resultPoints;
 }
