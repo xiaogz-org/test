@@ -11,6 +11,12 @@
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
     "leaflet.pm": "^2.2.0",
+    "leaflet-draw": "^1.0.4",
+    "leaflet-heatmap": "^1.0.0",
+    "leaflet-omnivore": "^0.3.4",
+    "leaflet-polylinedecorator": "^1.6.0",
+    "leaflet-semicircle": "^2.0.4",
+    "leaflet.markercluster": "^1.5.3",
     "vue": "3.2.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"

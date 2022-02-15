@@ -4,8 +4,10 @@
 
 <script>
 import MapCore from '../../../utils/loongShipMap.js'
-import worldCanvas from '../../../utils/world-canvas.js'
+import WorldRequest from '../../../utils/world-request.js'
 import {defineComponent,onMounted} from 'vue';
+import { shipList } from '../../../mock/shipList.js'
+import * as canvasUtils from '../../../utils/canvas-utils'
 
 export default defineComponent({
   name: 'baseMap',
@@ -16,29 +18,41 @@ export default defineComponent({
       MapCore.mapChange();
       let map = MapCore.$map;
 
-      map.on("zoom", (e) => {
-        /**
-         * 根据比例重绘船舶
-         * 根据船长渲染（14级渲染超过200米的船，15级渲染超过100米的，16级渲染大于50米的）
-         */
+      WorldRequest.init(map)
+      
+     /*  map.on("zoom", (e) => {
       })
       map.on("move", (e) => {
-        //地图发生zoom时，也会执行move
-        /**
-         * 1、重置canvas
-         * 2、重新请求新区域船舶信息
-         * 3、重新将canvas上的船舶定位（随着地图移动）
-         */
+        
         worldCanvas.resetCanvas()
         worldCanvas.clear()
+        worldCanvas.drawRedBox()
         worldCanvas.drawAllShip()
       })
       map.on('click', e => {
         //console.log(e);
       });
+      
+      handleShipList(map)
+      const worldCanvas = new WorldCanvas(shipList)
       worldCanvas.init(map)
-      worldCanvas.drawAllShip()
+      worldCanvas.drawAllShip() */
     });
+
+    function handleShipList(map) {
+      shipList.forEach((ship, index) => {
+        console.log(ship);
+        let lat = ship.lat
+        let lng = ship.lng || ship.lon
+        //经纬度转换成坐标
+        const { shipX, shipY } = canvasUtils.getShipXY(lat, lng, map)
+        shipList[index] = {
+          ...ship,
+          shipX,
+          shipY
+        }
+      });
+    }
   }
 });
 </script>

@@ -58,7 +58,9 @@ export const getAreaPos = (shipX, shipY, rotate) => {
     }
   ]
 }
-//获取大型船舶区域定位, 船长、船宽根据船舶实际决定，并设定最大和最小范围，可根据地图比例缩放
+/**获取大型船舶区域定位, 船长、船宽根据船舶实际决定，并设定最大和最小范围，可根据地图比例缩放
+ * 14级渲染超过200米，15级渲染超过100米， 16级渲染超过50米
+*/
 export const getBigShipAreaPos = (ship, zoom) => {
   // 由于 Y 轴是相反的，所以需要...
   const {shipX, shipY, rotate, breadth, length} = ship
@@ -84,7 +86,7 @@ export const getBigShipAreaPos = (ship, zoom) => {
     {x: -BIG_SHIP_HALF_BREADTH, y: BIG_SHIP_HALF_LENGTH},
   ]
 
-  if(zoom <= 14) {
+  if(zoom <= 14 || breadth < 10 || length < 15) {
     ordinaryShip.forEach(v => {
       resultPoints.push(pointOffset(v.x, v.y))
     })
@@ -93,6 +95,7 @@ export const getBigShipAreaPos = (ship, zoom) => {
       resultPoints.push(pointOffset(v.x, v.y))
     })
   }
+  //船舶坐标轴位置、偏移定位
   function pointOffset(x1,y1) {
     let x = x1 * Math.cos(rad) + y1 * Math.sin(rad) + shipX
     let y = -x1 * Math.sin(rad) + y1 * Math.cos(rad) + shipY
@@ -100,4 +103,38 @@ export const getBigShipAreaPos = (ship, zoom) => {
   }
   //console.log(shipPoint);
   return resultPoints;
+}
+
+/**
+ * 获取当前地图的四个角的经纬度
+ */
+ export const getBoundsLatLng = map => {
+  if (map) {
+    const bounds = map.getBounds()
+    const SW = bounds.getSouthWest() // 西南
+    const NE = bounds.getNorthEast() // 东北
+    // const NW = bounds.getNorthWest()
+    // const SE = bounds.getSouthEast()
+
+    return [SW.lng, SW.lat, NE.lng, NE.lat]
+  }
+
+  return null
+}
+export const lnglatsTrans = (lat, lng, type) => {
+  let lnglat = L.latLng(lat / 600000, lng / 600000)
+  if ([3, 4, 5, 6].includes(type)) return lnglat
+  if (type == 0 || type == 2) {
+    let arrxy = L.GPS.transform(lnglat.lat, lnglat.lng)
+    lnglat.lng = arrxy[1]
+    lnglat.lat = arrxy[0]
+  }
+  return lnglat
+}
+/**处理角度*/
+ export const getRotate = (speed, heading, course) => {
+  speed = +speed || 0
+  heading = +heading || 0
+  course = +course || 0
+  return speed > 0.1 ? course : heading
 }
