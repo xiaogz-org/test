@@ -46,7 +46,7 @@ class worldRequest {
       const {shipX, shipY} = canvasUtils.getShipXY(lat, lng, this._map) 
       //areaPos
       const areaPos = canvasUtils.getBigShipAreaPos({...ship, shipX, shipY, rotate}, this._map.getZoom())
-
+      console.log(shipX, shipY);
       this.shipMaps.push({...ship, lng, lat, shipX, shipY, rotate, areaPos})
     })
     /**处理船舶尾迹 */
