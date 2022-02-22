@@ -19,7 +19,7 @@ export default defineComponent({
       let map = MapCore.$map;
       let bounds = map.getBounds()
       let {x, y} = map.getSize();
-      console.log(map.getSize());
+
       //西南 左下角
       let leftPoint = {
         lat:bounds._southWest.lat,
@@ -31,7 +31,6 @@ export default defineComponent({
         lng:bounds._northEast.lng
       }
       let distance = map.distance(leftPoint, rightPoint) / 1852;
-      console.log(distance / x);
       WorldRequest.init(map)
      /*  map.on("zoom", (e) => {
       })

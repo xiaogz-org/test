@@ -18,7 +18,7 @@ export const shipList = [
     "length": 1022,
     "sourceId": "86",
     "safeRadius": null
-},
+  },
   {
     "mmsi": 412457720,
     "lat": 14726319,

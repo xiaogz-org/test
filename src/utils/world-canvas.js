@@ -18,7 +18,7 @@ class WorldCanvas {
     this.canvas.height = this.CH = height
     document.querySelector('.leaflet-map-pane').append(this.canvas)
     this.ctx = this.canvas.getContext('2d')
-
+    this.drawRect()
     this.canvas.addEventListener('mousemove', (e) => {
       let x = e.pageX, y = e.pageY
       //重新绘制canvas上的路径
@@ -50,6 +50,17 @@ class WorldCanvas {
         }
       }
     })
+  }
+  drawRect() {
+    let ctx = this.ctx
+    ctx.fillStyle = "#3b81f0"
+    ctx.fillRect(100, 100, 500, 500)
+    ctx.save()
+    ctx.fillStyle = "#f00"
+    ctx.translate(350, 350)
+    ctx.rotate(45)
+    ctx.fillRect(-250, -250, 500, 500)
+    
   }
   //绘制船舶
   drawShip(ship) {
