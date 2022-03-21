@@ -1,5 +1,7 @@
 <template>
-  <div id="map" class="map"></div>
+  <div id="map" class="map">
+    <ship-menu></ship-menu>
+  </div>
 </template>
 
 <script>
@@ -10,65 +12,69 @@ import { shipList } from '../../../mock/shipList.js'
 import * as canvasUtils from '../../../utils/canvas-utils'
 
 export default defineComponent({
+  components: { shipMenu },
   name: 'baseMap',
   props: {},
-  setup() {
-    onMounted(async () => {
-      MapCore.initMap();
-      MapCore.mapChange();
-      let map = MapCore.$map;
-      let bounds = map.getBounds()
-      let {x, y} = map.getSize();
-
-      //西南 左下角
-      let leftPoint = {
-        lat:bounds._southWest.lat,
-        lng:bounds._southWest.lng
-      }
-      //东南 右下角
-      let rightPoint = {
-        lat:bounds._southWest.lat,
-        lng:bounds._northEast.lng
-      }
-      let distance = map.distance(leftPoint, rightPoint) / 1852;
-      WorldRequest.init(map)
-     /*  map.on("zoom", (e) => {
-      })
-      map.on("move", (e) => {
-        
-        worldCanvas.resetCanvas()
-        worldCanvas.clear()
-        worldCanvas.drawRedBox()
-        worldCanvas.drawAllShip()
-      })
-      map.on('click', e => {
-        //console.log(e);
-      });
-      
-      handleShipList(map)
-      const worldCanvas = new WorldCanvas(shipList)
-      worldCanvas.init(map)
-      worldCanvas.drawAllShip() */
-    });
-
-    function handleShipList(map) {
-      shipList.forEach((ship, index) => {
-        console.log(ship);
-        let lat = ship.lat
-        let lng = ship.lng || ship.lon
-        //经纬度转换成坐标
-        const { shipX, shipY } = canvasUtils.getShipXY(lat, lng, map)
-        
-        shipList[index] = {
-          ...ship,
-          shipX,
-          shipY
-        }
-      });
-    }
-  }
 });
 </script>
+<script setup>
+  import shipMenu from './shipMenu.vue'
+
+  onMounted(async () => {
+    MapCore.initMap();
+    MapCore.mapChange();
+    let map = MapCore.$map;
+    let bounds = map.getBounds()
+    let {x, y} = map.getSize();
+
+    //西南 左下角
+    let leftPoint = {
+      lat:bounds._southWest.lat,
+      lng:bounds._southWest.lng
+    }
+    //东南 右下角
+    let rightPoint = {
+      lat:bounds._southWest.lat,
+      lng:bounds._northEast.lng
+    }
+    let distance = map.distance(leftPoint, rightPoint) / 1852;
+    WorldRequest.init(map)
+    /*  map.on("zoom", (e) => {
+    })
+    map.on("move", (e) => {
+      
+      worldCanvas.resetCanvas()
+      worldCanvas.clear()
+      worldCanvas.drawRedBox()
+      worldCanvas.drawAllShip()
+    })
+    map.on('click', e => {
+      //console.log(e);
+    });
+    
+    handleShipList(map)
+    const worldCanvas = new WorldCanvas(shipList)
+    worldCanvas.init(map)
+    worldCanvas.drawAllShip() */
+  });
+
+  function handleShipList(map) {
+    shipList.forEach((ship, index) => {
+      console.log(ship);
+      let lat = ship.lat
+      let lng = ship.lng || ship.lon
+      //经纬度转换成坐标
+      const { shipX, shipY } = canvasUtils.getShipXY(lat, lng, map)
+      
+      shipList[index] = {
+        ...ship,
+        shipX,
+        shipY
+      }
+    });
+  }
+</script>
+
 
 <style scoped>
 .map {
@@ -87,4 +93,5 @@ export default defineComponent({
 .leaflet-grab {
   cursor: default;
 }
+
 </style>

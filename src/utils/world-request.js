@@ -46,7 +46,7 @@ class worldRequest {
       const {shipX, shipY} = canvasUtils.getShipXY(lat, lng, this._map) 
       //areaPos
       const areaPos = canvasUtils.getBigShipAreaPos({...ship, shipX, shipY, rotate}, this._map.getZoom())
-      console.log(shipX, shipY);
+      //console.log(shipX, shipY);
       this.shipMaps.push({...ship, lng, lat, shipX, shipY, rotate, areaPos})
     })
     /**处理船舶尾迹 */
@@ -82,12 +82,13 @@ class worldRequest {
       //重绘
       this.reDraw()
       this.shipMaps.forEach(ship => {
-        WorldCanvas.drawShip(ship)    
+        WorldCanvas.drawShip(ship)
       })
       if(this.shipData) {
         WorldCanvas.drawRedBox(this.shipData)
+        //弹窗
+        WorldCanvas.redrawPopup(this.shipData)
       }
-      
     })
     this._map.on('click', e => {
       console.log('click');
@@ -96,9 +97,11 @@ class worldRequest {
       console.log(e);
     })
   }
-  //处理船舶数据
-  //拖动地图等操作需要不断计算坐标
-  //重新计算船舶的shipX、shipY和areaPos
+  /** 
+   * 处理船舶数据
+   * 拖动地图等操作需要不断计算坐标
+   * 重新计算船舶的shipX、shipY和areaPos
+   */ 
   reDraw() {
     const shipMaps = this.shipMaps
     shipMaps.forEach((ship,i) => {

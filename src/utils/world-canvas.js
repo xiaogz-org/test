@@ -1,5 +1,6 @@
 import * as canvasUtils from './canvas-utils'
 import WorldRequest from './world-request'
+import store from '../store/index.js'
 
 class WorldCanvas {
   constructor() {
@@ -43,24 +44,64 @@ class WorldCanvas {
       for(let val of WorldRequest.shipMaps) {
         this.drawShip(val)
         if(this.ctx.isPointInPath(x, y)) {
-          console.log(val);
+          //console.log(val);
           WorldRequest.clickEventTrigger(val)
           //绘制红框
           this.drawRedBox(val)
         }
       }
     })
+    this.canvas.addEventListener('mousedown', (e) => {
+      let x = e.pageX, y = e.pageY
+      if (e.button == 2) {
+        //绘制弹窗组件
+        for(let ship of WorldRequest.shipMaps) {
+          this.drawShip(ship)
+          if(this.ctx.isPointInPath(x, y)) {
+            //console.log(val);
+            WorldRequest.clickEventTrigger(ship)
+            //绘制红框
+            this.drawRedBox(ship)
+            console.log(ship);
+            store.commit('onShowShipMenu', {isShow: true, x: ship.shipX, y: ship.shipY})
+            document.querySelector('#map').oncontextmenu = (e) => {
+              return false
+            }
+            break;
+          }
+          document.querySelector('#map').oncontextmenu = (e) => {
+            return true
+          }
+        }
+      }
+      if (e.button == 1) {
+        //console.log('滚轮');
+      }
+      if (e.button == 0) {
+        //console.log('左键');
+      }
+      
+    })
   }
   drawRect() {
     let ctx = this.ctx
-    ctx.fillStyle = "#3b81f0"
-    ctx.fillRect(100, 100, 500, 500)
-    ctx.save()
-    ctx.fillStyle = "#f00"
-    ctx.translate(350, 350)
-    ctx.rotate(45)
-    ctx.fillRect(-250, -250, 500, 500)
-    
+  ctx.fillRect(0,0,150,150);   // 使用默认设置绘制一个矩形
+  ctx.save();                  // 保存默认状态
+
+  ctx.fillStyle = '#09F'       // 在原有配置基础上对颜色做改变
+  ctx.fillRect(15,15,120,120); // 使用新的设置绘制一个矩形
+
+  ctx.save();                  // 保存当前状态
+  ctx.fillStyle = '#FFF'       // 再次改变颜色配置
+  ctx.globalAlpha = 0.5;
+  ctx.fillRect(30,30,90,90);   // 使用新的配置绘制一个矩形
+
+  ctx.restore();               // 重新加载之前的颜色状态
+  ctx.fillRect(45,45,60,60);   // 使用上一次的配置绘制一个矩形
+
+  ctx.restore();               // 加载默认颜色配置
+  ctx.fillRect(60,60,30,30);   // 使用加载的配置绘制一个矩形
+
   }
   //绘制船舶
   drawShip(ship) {
@@ -156,6 +197,9 @@ class WorldCanvas {
   }
   clear() {
     this.ctx.clearRect(0, 0, this.CW, this.CH)
+  }
+  redrawPopup(ship) {
+    store.commit('onShowShipMenu', {isShow: true, x: ship.shipX, y: ship.shipY})
   }
 }
 

@@ -108,7 +108,7 @@ export const getBigShipAreaPos = (ship, zoom) => {
 /**
  * 获取当前地图的四个角的经纬度
  */
- export const getBoundsLatLng = map => {
+export const getBoundsLatLng = map => {
   if (map) {
     const bounds = map.getBounds()
     const SW = bounds.getSouthWest() // 西南
